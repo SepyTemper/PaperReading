@@ -168,13 +168,35 @@
 
 - One Shot Score：使用单个示例作为instruction，重新评估模型在相同任务上的表现，提供新的分数
 
-- Golden Score(GS)：Definited as $GS(z) = \frac{1}{m} \sum_{i = 1}^{m} \mathbb{I}[s_{iit}^i(z)>s_{zsl}^i(z)] \in [0, 1]$， where z as a example of instruction, m as the number of tasks, $s_{iit}$ as One Shot Score, $s_{zsl}$ as Zero Shot Score，认为GS越大，该instruction越有价值
+- Golden Score(GS)：Definited as $GS(z) = \frac{1}{m} \sum_{i = 1}^{m} \mathbb{I}[s_{iit}^i(z)>s_{zsl}^i(z)] \in [0, 1], where z as a example of instruction, m as the number of tasks, s_{iit} as One Shot Score, s_{zsl} as Zero Shot Score$，认为GS越大，该instruction越有价值
 
 对instruction数据集设定GS阈值进行筛选得到优质训练数据即为Nuggets
 
 实验发现只使用好的instruction训练效果可能比使用完整instruction集更好，但GS过高筛选剩余的instruction数量过少又会使训练效果下降，因此需要考虑optimal GS阈值。
 
 可从预定义任务集选择一个子集来得到instruction集的GS值。实验发现使用KMeans对预定义任务聚类后，选择聚类质心作为该子集得到的GS值应用效果更佳。
+
+## Voyager
+
+### Related Work
+
+#### Chain of Thoughts
+
+通过生成一系列中间推理步骤（链式推理），并在提示中提供一些示例，这种推理能力可以自然地在足够大的语言模型中出现。
+
+- 链式推理提示在一系列算术、常识和符号推理任务中显著提高了模型性能
+
+- 链式推理提示对较小模型无显著影响，但在模型参数达到约100B时，才会显著提升模型性能。较小规模的模型尽管生成了流畅的链式推理，但逻辑性较差，导致表现不佳​
+
+### Main Part
+
+Voyager为一种在开放世界环境中自动进行探索和任务执行的智能体系统。该系统基于大型语言模型（如GPT-4），通过自动化任务分解和自我验证模块，提升了探索和任务完成能力。主要包括三个组成部分：
+
+- Automatic Curriculum：系统自动生成一系列逐步增加难度的任务，形成一个课程体系，推动智能体持续学习和进步，使Voyager能够在无需人为干预的情况下进行任务学习和技能提升
+
+- Skill Library：Voyager在探索过程中积累技能，保存在技能库中。在需要时，系统从技能库中检索并应用已学得的技能，提高任务执行的效率和准确性
+
+- Iterative Prompting Mechanism：为行为生成可执行代码，并通过自我检测和环境或编译器反馈来提高代码生成的效率和准确性
 
 ## Additions
 
@@ -226,3 +248,15 @@ kv cache不属于其中任何一种，但类似于Activation Memory
 - Memory Compression：通过数据压缩技术对激活值进行压缩存储，减少内存使用。例如，使用稀疏表示或量化技术对激活值进行压缩处理
 
 - 3D Parallelism：Mentioned above
+
+### Prompt Components
+
+- Instruction：Instructions are likely the most commonly used prompt component
+
+- Primary Content：Primary content refers to some sort of text that is being processed or transformed by the model
+
+- Examples：Giving Examples to the model
+
+- Cue：Cues act as the "jumpstart" for the output of the model, helping to direct the model to the desired output
+
+- Supporting Content：Supporting content is information that the model can utilize to influence the output in some way
